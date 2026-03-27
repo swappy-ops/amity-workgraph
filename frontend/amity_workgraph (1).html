@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nexus — Amity Campus Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+<style>
+  /* ─── TOKENS ─────────────────────────────────────────────── */
+  :root {
+    --navy:      #002147;
+    --navy-mid:  #003366;
+    --navy-soft: #e8edf5;
+    --gold:      #F5B800;
+    --gold-dark: #c99500;
+    --gold-pale: #fffbea;
+    --white:     #ffffff;
+    --off:       #f4f5f7;
+    --border:    #dde2ec;
+    --text:      #0d1b2a;
+    --muted:     #5a6782;
+    --green:     #1a7f52;
+    --green-bg:  #e8f5ee;
+    --red:       #b91c1c;
+    --red-bg:    #fef2f2;
+    --stipend:   #7c3aed;
+    --stipend-bg:#f3f0ff;
+    --radius:    6px;
+    --shadow:    0 1px 4px rgba(0,33,71,.08), 0 4px 16px rgba(0,33,71,.06);
+    --shadow-lg: 0 8px 32px rgba(0,33,71,.13);
+  }
+
+  /* ─── RESET ──────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; font-family: inherit; border: none; }
+  input, select, textarea { font-family: inherit; }
+  .hidden { display: none !important; }
+
+  /* ─── PAGE TRANSITIONS ───────────────────────────────────── */
+  .page { display: none; animation: fadeUp .3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── NAVBAR ─────────────────────────────────────────────── */
+  .navbar {
+    background: var(--navy);
+    border-bottom: 3px solid var(--gold);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1160px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0;
+    padding: 0 24px; height: 60px;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-right: auto;
+  }
+  .nav-logo {
+    width: 34px; height: 34px;
+    background: var(--gold);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; color: var(--navy); font-weight: 400;
+    flex-shrink: 0;
+  }
+  .nav-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px; color: var(--white);
+    letter-spacing: .01em; line-height: 1.1;
+  }
+  .nav-sub { font-size: 10px; color: rgba(255,255,255,.5); letter-spacing: .08em; text-transform: uppercase; }
+  .nav-links { display: flex; align-items: center; gap: 2px; }
+  .nav-link {
+    padding: 8px 14px; border-radius: var(--radius);
+    font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,.75);
+    transition: background .15s, color .15s;
+    cursor: pointer;
+  }
+  .nav-link:hover, .nav-link.active { background: rgba(255,255,255,.1); color: var(--white); }
+  .nav-link.post-btn {
+    background: var(--gold); color: var(--navy);
+    margin-left: 8px; font-weight: 600;
+  }
+  .nav-link.post-btn:hover { background: var(--gold-dark); }
+  .nav-user {
+    margin-left: 16px; padding-left: 16px;
+    border-left: 1px solid rgba(255,255,255,.15);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px; color: rgba(255,255,255,.6);
+  }
+  .nav-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gold); color: var(--navy);
+    font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-user-info { line-height: 1.2; }
+  .nav-user-name { color: var(--white); font-size: 13px; font-weight: 500; }
+  .nav-logout { font-size: 11px; color: rgba(255,255,255,.4); cursor: pointer; }
+  .nav-logout:hover { color: rgba(255,255,255,.8); }
+
+  /* ─── LAYOUT ─────────────────────────────────────────────── */
+  .container { max-width: 1160px; margin: 0 auto; padding: 32px 24px; }
+  .container-narrow { max-width: 720px; margin: 0 auto; padding: 32px 24px; }
+
+  /* ─── PAGE HEADERS ───────────────────────────────────────── */
+  .page-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px; margin-bottom: 28px;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; color: var(--navy); font-weight: 400;
+  }
+  .page-header p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+  /* ─── BADGES ─────────────────────────────────────────────── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 4px;
+    font-size: 11.5px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .badge-paid   { background: var(--green-bg); color: var(--green); }
+  .badge-stipend{ background: var(--stipend-bg); color: var(--stipend); }
+  .badge-unpaid { background: #f1f1f1; color: #666; }
+  .badge-faculty{ background: var(--navy-soft); color: var(--navy); }
+  .badge-student{ background: #fff3cd; color: #7a5500; }
+  .badge-type   { background: var(--border); color: var(--muted); }
+  .badge-dept   { background: #e0f0ff; color: #0053a0; }
+  .badge-pending   { background: #fff7ed; color: #b45309; }
+  .badge-accepted  { background: var(--green-bg); color: var(--green); }
+  .badge-rejected  { background: var(--red-bg); color: var(--red); }
+
+  /* ─── FEED LAYOUT ────────────────────────────────────────── */
+  .feed-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ─── SIDEBAR FILTERS ────────────────────────────────────── */
+  .sidebar {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px 20px;
+    box-shadow: var(--shadow); position: sticky; top: 80px;
+  }
+  .sidebar-title {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 18px; letter-spacing: .01em;
+  }
+  .filter-section { margin-bottom: 20px; }
+  .filter-section-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .08em;
+    margin-bottom: 10px; display: block;
+  }
+  .checkbox-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 0; cursor: pointer;
+  }
+  .checkbox-row input[type=checkbox] {
+    width: 16px; height: 16px; accent-color: var(--navy);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .checkbox-row span { font-size: 13.5px; color: var(--text); user-select: none; }
+  .btn-clear-filters {
+    width: 100%; padding: 10px;
+    background: var(--gold); color: var(--navy);
+    border-radius: var(--radius); font-size: 13.5px; font-weight: 700;
+    margin-top: 6px; transition: background .15s;
+  }
+  .btn-clear-filters:hover { background: var(--gold-dark); }
+
+  /* ─── JOB LIST ───────────────────────────────────────────── */
+  .jobs-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .jobs-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: var(--navy); font-weight: 400;
+  }
+  .sort-select {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .sort-select select {
+    padding: 6px 10px; border: 1px solid var(--border);
+    border-radius: var(--radius); font-size: 13px;
+    background: var(--white); color: var(--text); outline: none;
+  }
+  .job-list { display: flex; flex-direction: column; gap: 12px; }
+  .job-row {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px;
+    box-shadow: var(--shadow);
+    display: flex; align-items: flex-start; gap: 16px;
+    transition: border-color .2s, box-shadow .2s;
+    cursor: pointer;
+  }
+  .job-row:hover { border-color: var(--gold); box-shadow: var(--shadow-lg); }
+  .job-row-main { flex: 1; min-width: 0; }
+  .job-row-top {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; flex-wrap: wrap;
+  }
+  .job-row-time { font-size: 12px; color: var(--muted); }
+  .job-row-title {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    margin-bottom: 5px; line-height: 1.35;
+  }
+  .job-row-sub {
+    font-size: 12.5px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    margin-bottom: 7px;
+  }
+  .job-row-sub .divider { color: var(--border); }
+  .job-row-desc {
+    font-size: 13px; color: var(--muted); line-height: 1.5;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 520px;
+  }
+  .job-row-right {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 8px; flex-shrink: 0;
+  }
+  .job-row-badges { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+  .btn-apply {
+    padding: 9px 22px;
+    background: var(--navy); color: var(--white);
+    border-radius: var(--radius); font-size: 13.5px; font-weight: 600;
+    transition: background .15s; white-space: nowrap;
+  }
+  .btn-apply:hover { background: var(--navy-mid); }
+  .amount-badge {
+    background: var(--navy-soft); color: var(--navy);
+    border-radius: 4px; padding: 3px 9px;
+    font-size: 12px; font-weight: 700;
+  }
+
+  /* ─── OLD CARD STYLES (kept for detail page) ─────────────── */
+
+  /* ─── LOGIN PAGE ─────────────────────────────────────────── */
+  #page-login {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #004080 100%);
+    position: relative; overflow: hidden;
+  }
+  #page-login::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23F5B800' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 1;
+  }
+  .login-card {
+    background: var(--white); border-radius: 10px;
+    width: 420px; padding: 40px 40px 36px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    position: relative; z-index: 1;
+    animation: fadeUp .4s ease;
+  }
+  .login-header { text-align: center; margin-bottom: 28px; }
+  .login-logo {
+    width: 52px; height: 52px; background: var(--gold); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 26px;
+    color: var(--navy); margin: 0 auto 14px;
+  }
+  .login-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: var(--navy); font-weight: 400;
+  }
+  .login-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .login-divider {
+    border: none; border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+  .role-toggle {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 20px;
+  }
+  .role-btn {
+    padding: 9px; text-align: center;
+    font-size: 13.5px; font-weight: 500; color: var(--muted);
+    background: var(--off); transition: background .15s, color .15s;
+    cursor: pointer; border: none;
+  }
+  .role-btn.active { background: var(--navy); color: var(--white); }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 6px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 14px; color: var(--text); background: var(--white);
+    outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(0,33,71,.08);
+  }
+  .form-group textarea { resize: vertical; min-height: 90px; }
+  .form-hint { font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+  .form-error { font-size: 11.5px; color: var(--red); margin-top: 5px; display: none; }
+  .btn-primary {
+    width: 100%; padding: 12px;
+    background: var(--navy); color: var(--white);
+    border-radius: var(--radius); font-size: 14.5px; font-weight: 600;
+    letter-spacing: .02em; transition: background .15s;
+  }
+  .btn-primary:hover { background: var(--navy-mid); }
+  .btn-primary.gold { background: var(--gold); color: var(--navy); }
+  .btn-primary.gold:hover { background: var(--gold-dark); }
+  .login-footer { text-align: center; margin-top: 20px; font-size: 12px; color: var(--muted); }
+
+  /* ─── JOB DETAIL ─────────────────────────────────────────── */
+  .detail-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 32px 36px;
+    box-shadow: var(--shadow);
+  }
+  .detail-card h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; color: var(--navy); font-weight: 400; margin-bottom: 12px;
+  }
+  .detail-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .detail-desc {
+    font-size: 14.5px; line-height: 1.7; color: var(--text);
+    border-top: 1px solid var(--border); padding-top: 20px; margin-top: 4px;
+  }
+  .detail-timeline {
+    background: var(--gold-pale); border: 1px solid #e8d96a;
+    border-radius: var(--radius); padding: 14px 16px;
+    margin-top: 16px; font-size: 13.5px; color: #6b5700;
+  }
+  .detail-timeline strong { display: block; margin-bottom: 4px; color: var(--gold-dark); }
+  .detail-amount-block {
+    background: var(--navy-soft); border-radius: var(--radius);
+    padding: 14px 16px; margin-top: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .detail-amount-num {
+    font-size: 28px; font-weight: 700; color: var(--navy);
+    letter-spacing: -.03em;
+  }
+  .detail-amount-label { font-size: 12px; color: var(--muted); }
+  .detail-poster {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .poster-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--navy); color: var(--white);
+    font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .poster-info strong { color: var(--text); display: block; font-size: 14px; }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--muted); margin-bottom: 20px;
+    cursor: pointer; transition: color .15s;
+  }
+  .back-btn:hover { color: var(--navy); }
+
+  /* ─── APPLICATION FORM / APPLICANT LIST ──────────────────── */
+  .apply-section {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px 36px;
+    margin-top: 20px; box-shadow: var(--shadow);
+  }
+  .apply-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px; color: var(--navy); font-weight: 400; margin-bottom: 18px;
+  }
+  .btn-submit {
+    padding: 10px 24px;
+    background: var(--navy); color: var(--white);
+    border-radius: var(--radius); font-size: 14px; font-weight: 600;
+    transition: background .15s;
+  }
+  .btn-submit:hover { background: var(--navy-mid); }
+  .applicant-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  .applicant-row:last-child { border-bottom: none; }
+  .applicant-info { flex: 1; }
+  .applicant-name { font-weight: 600; font-size: 14px; color: var(--text); }
+  .applicant-enroll { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .applicant-proposal { font-size: 13.5px; color: var(--text); margin-top: 6px; line-height: 1.6; }
+  .applicant-bid { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .applicant-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn-accept {
+    padding: 7px 14px; background: var(--green-bg); color: var(--green);
+    border-radius: var(--radius); font-size: 12.5px; font-weight: 600;
+    transition: background .15s;
+  }
+  .btn-accept:hover { background: var(--green); color: white; }
+  .btn-reject {
+    padding: 7px 14px; background: var(--red-bg); color: var(--red);
+    border-radius: var(--radius); font-size: 12.5px; font-weight: 600;
+    transition: background .15s;
+  }
+  .btn-reject:hover { background: var(--red); color: white; }
+
+  /* ─── POST JOB FORM ──────────────────────────────────────── */
+  .form-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 32px 36px;
+    box-shadow: var(--shadow);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ─── DASHBOARD ──────────────────────────────────────────── */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
+  .tab-btn {
+    padding: 10px 20px; font-size: 14px; font-weight: 500; color: var(--muted);
+    background: none; border: none; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; cursor: pointer; transition: color .15s, border-color .15s;
+  }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeUp .25s ease; }
+  .dashboard-row {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 20px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 10px; box-shadow: var(--shadow);
+    cursor: pointer; transition: border-color .2s;
+  }
+  .dashboard-row:hover { border-color: var(--gold); }
+  .dashboard-row-info { flex: 1; }
+  .dashboard-row-title { font-weight: 600; font-size: 14.5px; color: var(--text); }
+  .dashboard-row-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .dashboard-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+  .applicant-count {
+    font-size: 12px; color: var(--muted);
+    background: var(--off); border-radius: 20px; padding: 3px 10px;
+  }
+  .empty-state {
+    text-align: center; padding: 48px 20px;
+    color: var(--muted); font-size: 14px;
+  }
+  .empty-state svg { margin-bottom: 12px; opacity: .3; }
+
+  /* ─── TOAST ──────────────────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 999;
+    background: var(--navy); color: var(--white);
+    padding: 12px 20px; border-radius: var(--radius);
+    font-size: 13.5px; box-shadow: var(--shadow-lg);
+    transform: translateY(80px); opacity: 0;
+    transition: transform .3s ease, opacity .3s ease;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 4px solid var(--gold); }
+  .toast.error   { border-left: 4px solid var(--red); }
+
+  /* ─── INSTITUTION STRIP ──────────────────────────────────── */
+  .inst-strip {
+    background: var(--gold); padding: 7px 24px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 11.5px; font-weight: 600; color: var(--navy);
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+
+  /* ─── SCROLLBAR ──────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--off); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .login-card { width: 94vw; padding: 28px 22px; }
+    .detail-card, .apply-section, .form-card { padding: 20px 16px; }
+    .job-grid { grid-template-columns: 1fr; }
+    .nav-links .nav-link:not(.post-btn) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOAST ════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ LOGIN PAGE ═══════════════════════════════════════════ -->
+<div id="page-login" class="page active">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">N</div>
+      <h1>Nexus</h1>
+      <p>Amity University · Campus Freelance &amp; Opportunity Platform</p>
+    </div>
+    <hr class="login-divider" />
+    <div class="role-toggle">
+      <button class="role-btn active" data-role="student" onclick="setRole('student')">Student</button>
+      <button class="role-btn" data-role="faculty" onclick="setRole('faculty')">Faculty</button>
+    </div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="login-name" placeholder="e.g. Rohan Kapoor" autocomplete="name" />
+    </div>
+    <div class="form-group" id="enroll-group">
+      <label>Enrollment Number</label>
+      <input type="text" id="login-enroll" placeholder="A021142924XXX" autocomplete="off"
+             oninput="validateEnrollField()" />
+      <div class="form-hint" id="enroll-hint">UX 2023–27 batch: A021142924001 · Other depts: A0 + 11 digits</div>
+      <div class="form-error" id="enroll-error">That doesn't look like a valid Amity enrollment number.</div>
+    </div>
+    <button class="btn-primary gold" onclick="doLogin()">Enter Platform →</button>
+    <div class="login-footer">Restricted to Amity University members · Lucknow</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN APP (shown after login) ════════════════════════ -->
+<div id="app" class="hidden">
+  <div class="inst-strip">
+    ◆ Nexus · Amity University — Internal Campus Network · Authorised Personnel Only ◆
+  </div>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-logo">N</div>
+        <div>
+          <div class="nav-title">Nexus</div>
+          <div class="nav-sub">Amity University</div>
+        </div>
+      </div>
+      <div class="nav-links">
+        <div class="nav-link active" id="nav-feed" onclick="showPage('feed')">Opportunities</div>
+        <div class="nav-link" id="nav-dash" onclick="showPage('dashboard')">My Dashboard</div>
+        <div class="nav-link post-btn" onclick="showPage('post')">+ Post Work</div>
+      </div>
+      <div class="nav-user">
+        <div class="nav-avatar" id="nav-avatar">R</div>
+        <div class="nav-user-info">
+          <div class="nav-user-name" id="nav-username">Rohan Kapoor</div>
+          <div class="nav-logout" id="nav-enroll" onclick="logout()" title="Click to sign out">A021142924042 ↩</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- FEED PAGE -->
+  <div id="page-feed" class="page active">
+    <div class="container">
+      <div class="feed-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+          <div class="sidebar-title">Filters</div>
+
+          <div class="filter-section">
+            <span class="filter-section-label">Source</span>
+            <label class="checkbox-row"><input type="checkbox" id="f-faculty" checked onchange="renderFeed()"><span>Faculty</span></label>
+            <label class="checkbox-row"><input type="checkbox" id="f-student" checked onchange="renderFeed()"><span>Student</span></label>
+          </div>
+
+          <div class="filter-section">
+            <span class="filter-section-label">Type</span>
+            <label class="checkbox-row"><input type="checkbox" id="f-internship" checked onchange="renderFeed()"><span>Internship</span></label>
+            <label class="checkbox-row"><input type="checkbox" id="f-freelance" checked onchange="renderFeed()"><span>Freelance</span></label>
+            <label class="checkbox-row"><input type="checkbox" id="f-part-time" checked onchange="renderFeed()"><span>Part-Time</span></label>
+            <label class="checkbox-row"><input type="checkbox" id="f-project" checked onchange="renderFeed()"><span>Project</span></label>
+          </div>
+
+          <div class="filter-section">
+            <span class="filter-section-label">Compensation</span>
+            <label class="checkbox-row"><input type="checkbox" id="f-paid" checked onchange="renderFeed()"><span>Paid</span></label>
+            <label class="checkbox-row"><input type="checkbox" id="f-stipend" checked onchange="renderFeed()"><span>Stipend</span></label>
+            <label class="checkbox-row"><input type="checkbox" id="f-unpaid" checked onchange="renderFeed()"><span>Unpaid</span></label>
+          </div>
+
+          <button class="btn-clear-filters" onclick="clearFilters()">Clear Filters</button>
+        </aside>
+
+        <!-- JOB LIST -->
+        <div>
+          <div class="jobs-header">
+            <h2>Latest Jobs <span id="feed-count" style="font-size:14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400"></span></h2>
+            <div class="sort-select">
+              Sort by:
+              <select id="sort-select" onchange="renderFeed()">
+                <option value="default">Best Match</option>
+                <option value="newest">Newest</option>
+                <option value="amount">Amount ↓</option>
+              </select>
+            </div>
+          </div>
+          <div class="job-list" id="job-list"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB DETAIL PAGE -->
+  <div id="page-detail" class="page">
+    <div class="container-narrow">
+      <div class="back-btn" id="detail-back-btn" onclick="showPage('feed')">← Back to Opportunities</div>
+      <div class="detail-card" id="detail-card"></div>
+      <div class="apply-section" id="apply-section"></div>
+    </div>
+  </div>
+
+  <!-- POST JOB PAGE -->
+  <div id="page-post" class="page">
+    <div class="container-narrow">
+      <div class="page-header">
+        <h1>Post an Opportunity</h1>
+        <p>All departments welcome — design, engineering, AI/ML, marketing, and more.</p>
+      </div>
+      <div class="form-card">
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="pj-title" placeholder="e.g. Research Assistant – NLP Project" />
+        </div>
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea id="pj-desc" rows="5" placeholder="What does this involve? What skills are needed? What will the collaborator gain?"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Department</label>
+            <input type="text" id="pj-dept" placeholder="e.g. AI/ML, Design, Marketing…" />
+          </div>
+          <div class="form-group">
+            <label>Type *</label>
+            <select id="pj-type">
+              <option value="">Select…</option>
+              <option value="internship">Internship</option>
+              <option value="freelance">Freelance</option>
+              <option value="part-time">Part-time</option>
+              <option value="project">Project</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Compensation *</label>
+          <select id="pj-comp" onchange="onCompChange()">
+            <option value="">Select…</option>
+            <option value="paid">Paid (Cash)</option>
+            <option value="stipend">Stipend</option>
+            <option value="unpaid">Unpaid / Portfolio / Certificate</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="pj-amount-group">
+          <label>Amount (₹)</label>
+          <input type="number" id="pj-amount" placeholder="e.g. 5000" min="0" />
+        </div>
+        <div class="form-group hidden" id="pj-timeline-group">
+          <label>What will the collaborator receive? *</label>
+          <input type="text" id="pj-timeline" placeholder="e.g. 6 weeks, certificate + recommendation letter" />
+          <div class="form-hint">Required for unpaid opportunities — be specific and honest.</div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+          <button class="btn-view" onclick="showPage('feed')">Cancel</button>
+          <button class="btn-submit" onclick="submitJob()">Post Opportunity</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PAGE -->
+  <div id="page-dashboard" class="page">
+    <div class="container">
+      <div class="page-header">
+        <h1 id="dash-heading">My Dashboard</h1>
+        <p id="dash-sub">Track your posted opportunities and applications.</p>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('posts')">My Posts</button>
+        <button class="tab-btn" onclick="switchTab('apps')">My Applications</button>
+      </div>
+      <div class="tab-content active" id="tab-posts"></div>
+      <div class="tab-content" id="tab-apps"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPT ═══════════════════════════════════════════════ -->
+<script>
+/* ── CONFIG ────────────────────────────────────────────────── */
+const API_BASE = 'http://localhost:3000/api'; // swap to real backend
+const USE_MOCK = true; // set false to hit real API
+
+/* ── ENROLLMENT VALIDATION ─────────────────────────────────── */
+const UX_2023 = /^A021142924\d{3}$/;
+const GENERIC  = /^A0\d{11}$/;
+function isValidEnroll(e) { return UX_2023.test(e) || GENERIC.test(e); }
+
+/* ── APP STATE ──────────────────────────────────────────────── */
+let currentUser = null;
+let currentRole = 'student';
+let jobs = [];
+let applications = [];
+let currentJobId = null;
+
+/* ── MOCK DATA ──────────────────────────────────────────────── */
+const mockUsers = [
+  { id:1, name:'Dr. Priya Menon',    enrollment_no:'FAC001', role:'faculty' },
+  { id:2, name:'Rohan Kapoor',       enrollment_no:'A021142924042', role:'student' },
+  { id:3, name:'Aisha Siddiqui',     enrollment_no:'A021142924078', role:'student' },
+  { id:4, name:'Prof. Arjun Sharma', enrollment_no:'FAC002', role:'faculty' },
+];
+
+const mockJobs = [
+  { id:1, title:'Research Assistant – NLP Project', description:'We are looking for a motivated student to assist in an ongoing NLP research project. The role involves data annotation, literature review, running experiments using Python, and co-authoring a conference paper. Ideal for students interested in AI and academic research.', department:'AI/ML', type:'project', compensation_type:'stipend', compensation_amount:3000, timeline:null, created_by:1, poster_name:'Dr. Priya Menon', poster_role:'faculty', created_at:'2025-03-20T09:00:00Z' },
+  { id:2, title:'Instagram Reels Editor — Tech Startup', description:'Fast-growing EdTech startup needs a creative video editor for weekly Instagram Reels. Must know CapCut or Premiere Pro. Flexible timing, remote-friendly. 4–6 reels per week. Portfolio required.', department:'Design', type:'freelance', compensation_type:'paid', compensation_amount:5000, timeline:null, created_by:2, poster_name:'Rohan Kapoor', poster_role:'student', created_at:'2025-03-21T11:30:00Z' },
+  { id:3, title:'Backend Developer – Campus Event App', description:'Building a mobile-first event discovery app for Amity. Need a backend dev comfortable with Node.js, REST APIs, and SQLite or PostgreSQL. Expected 6-week collaboration with bi-weekly check-ins. Strong addition to your portfolio.', department:'Engineering', type:'project', compensation_type:'unpaid', compensation_amount:null, timeline:'6 weeks · Certificate of contribution + strong recommendation letter from faculty supervisor', created_by:2, poster_name:'Rohan Kapoor', poster_role:'student', created_at:'2025-03-22T14:00:00Z' },
+  { id:4, title:'Campus Brand Photographer', description:'Looking for a skilled photographer to cover campus events, club activities, and promotional shoots for the semester. Work will be credited and used in official university communications.', department:'Marketing', type:'part-time', compensation_type:'paid', compensation_amount:800, timeline:null, created_by:3, poster_name:'Aisha Siddiqui', poster_role:'student', created_at:'2025-03-23T10:00:00Z' },
+  { id:5, title:'UI/UX Research — Faculty Capstone', description:'Seeking 2 UX students to assist with user research for a faculty-led capstone project on digital accessibility in education platforms. Involves conducting interviews, synthesising data, and presenting insights. Excellent opportunity for skill development.', department:'UX Design', type:'internship', compensation_type:'stipend', compensation_amount:2000, timeline:null, created_by:4, poster_name:'Prof. Arjun Sharma', poster_role:'faculty', created_at:'2025-03-24T08:30:00Z' },
+  { id:6, title:'Motion Graphics — Club Recruitment Reel', description:'Need a 60-90 second motion graphics reel for an upcoming club recruitment drive. Provide your showreel. Creative freedom guaranteed. Quick turnaround expected (1 week).', department:'Design', type:'freelance', compensation_type:'unpaid', compensation_amount:null, timeline:'1 week · Full credit + featured on official club channels + portfolio usage rights', created_by:3, poster_name:'Aisha Siddiqui', poster_role:'student', created_at:'2025-03-25T16:00:00Z' },
+];
+
+const mockApplications = [
+  { id:1, job_id:1, applicant_id:2, applicant_name:'Rohan Kapoor', enrollment_no:'A021142924042', proposal_text:'I have been working on transformer models for 6 months and have completed Andrew Ng\'s NLP specialisation. I would love to contribute to this research.', bid_amount:null, status:'pending', created_at:'2025-03-21T10:00:00Z' },
+  { id:2, job_id:1, applicant_id:3, applicant_name:'Aisha Siddiqui', enrollment_no:'A021142924078', proposal_text:'Currently pursuing a minor in data science. Have experience with spaCy and NLTK. Available 15 hrs/week.', bid_amount:null, status:'accepted', created_at:'2025-03-22T09:00:00Z' },
+  { id:3, job_id:2, applicant_id:3, applicant_name:'Aisha Siddiqui', enrollment_no:'A021142924078', proposal_text:'Portfolio: aisha.design · I edit 8–10 Reels/month for a local startup. Can provide samples.', bid_amount:4500, status:'pending', created_at:'2025-03-22T14:30:00Z' },
+];
+
+/* ── MOCK API ───────────────────────────────────────────────── */
+async function api(method, path, body) {
+  if (USE_MOCK) return mockHandler(method, path, body);
+  const res = await fetch(API_BASE + path, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-enrollment-no': currentUser?.enrollment_no || '',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  return res.json();
+}
+
+function mockHandler(method, path, body) {
+  // Login
+  if (path === '/auth/login') {
+    let user = mockUsers.find(u => u.enrollment_no === body.enrollment_no);
+    if (!user) {
+      user = { id: mockUsers.length + 1, name: body.name, enrollment_no: body.enrollment_no, role: body.role };
+      mockUsers.push(user);
+    }
+    return { ok:true, user };
+  }
+  // Jobs feed
+  if (method==='GET' && path.startsWith('/jobs') && !path.includes('/apply')) {
+    if (path === '/jobs') {
+      let list = [...mockJobs];
+      list.sort((a,b) => {
+        if (a.poster_role==='faculty' && b.poster_role!=='faculty') return -1;
+        if (b.poster_role==='faculty' && a.poster_role!=='faculty') return 1;
+        if (a.compensation_type==='unpaid' && b.compensation_type!=='unpaid') return 1;
+        if (b.compensation_type==='unpaid' && a.compensation_type!=='unpaid') return -1;
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+      return { ok:true, jobs: list };
+    }
+    const id = parseInt(path.split('/')[2]);
+    const job = mockJobs.find(j => j.id === id);
+    const apps = mockApplications.filter(a => a.job_id === id);
+    return { ok:true, job, applications: apps };
+  }
+  // Post job
+  if (method==='POST' && path==='/jobs') {
+    const newJob = { ...body, id: mockJobs.length+1, created_by: currentUser.id,
+      poster_name: currentUser.name, poster_role: currentUser.role,
+      created_at: new Date().toISOString() };
+    mockJobs.push(newJob);
+    return { ok:true, job: newJob };
+  }
+  // Apply
+  if (method==='POST' && path.endsWith('/apply')) {
+    const job_id = parseInt(path.split('/')[2]);
+    const app = { ...body, id: mockApplications.length+1, job_id,
+      applicant_id: currentUser.id, applicant_name: currentUser.name,
+      enrollment_no: currentUser.enrollment_no,
+      status: 'pending', created_at: new Date().toISOString() };
+    mockApplications.push(app);
+    return { ok:true, application: app };
+  }
+  // My applications
+  if (method==='GET' && path==='/applications/mine') {
+    const mine = mockApplications.filter(a => a.applicant_id === currentUser.id)
+      .map(a => ({ ...a, job_title: mockJobs.find(j=>j.id===a.job_id)?.title }));
+    return { ok:true, applications: mine };
+  }
+  // Accept/reject
+  if (method==='PATCH' && path.startsWith('/applications/')) {
+    const id = parseInt(path.split('/')[2]);
+    const app = mockApplications.find(a => a.id === id);
+    if (app) app.status = body.status;
+    return { ok:true, application: app };
+  }
+  return { ok:false, error:'Not found' };
+}
+
+/* ── AUTH ───────────────────────────────────────────────────── */
+function setRole(role) {
+  currentRole = role;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.toggle('active', b.dataset.role===role));
+  document.getElementById('enroll-group').classList.toggle('hidden', role==='faculty');
+}
+
+function validateEnrollField() {
+  const val = document.getElementById('login-enroll').value.trim();
+  const err = document.getElementById('enroll-error');
+  err.style.display = val && !isValidEnroll(val) ? 'block' : 'none';
+}
+
+async function doLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  const enroll = document.getElementById('login-enroll').value.trim().toUpperCase();
+  if (!name) { showToast('Please enter your name.', 'error'); return; }
+  if (currentRole === 'student') {
+    if (!isValidEnroll(enroll)) { showToast('Invalid enrollment number format.', 'error'); return; }
+  }
+  const enrollToSend = currentRole === 'faculty' ? 'FAC' + Date.now() : enroll;
+  const res = await api('POST', '/auth/login', { name, enrollment_no: enrollToSend, role: currentRole });
+  if (!res.ok) { showToast('Login failed. Try again.', 'error'); return; }
+  currentUser = res.user;
+  document.getElementById('page-login').classList.remove('active');
+  document.getElementById('page-login').style.display = 'none';
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('nav-avatar').textContent = currentUser.name[0].toUpperCase();
+  document.getElementById('nav-username').textContent = currentUser.name;
+  document.getElementById('nav-enroll').textContent = currentUser.enrollment_no + ' ↩';
+  loadFeed();
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('page-login').style.display = '';
+  document.getElementById('page-login').classList.add('active');
+  document.getElementById('login-name').value = '';
+  document.getElementById('login-enroll').value = '';
+}
+
+/* ── NAVIGATION ─────────────────────────────────────────────── */
+let detailOrigin = 'feed'; // track where detail was opened from
+
+function showPage(name) {
+  ['feed','detail','post','dashboard'].forEach(p => {
+    document.getElementById('page-'+p).classList.remove('active');
+  });
+  ['feed','dash'].forEach(n => document.getElementById('nav-'+n)?.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if (name==='feed')      { document.getElementById('nav-feed').classList.add('active'); loadFeed(); }
+  if (name==='dashboard') { document.getElementById('nav-dash').classList.add('active'); loadDashboard(); }
+}
+
+/* ── FEED ───────────────────────────────────────────────────── */
+async function loadFeed() {
+  const res = await api('GET', '/jobs');
+  jobs = res.jobs || [];
+  renderFeed();
+}
+
+function clearFilters() {
+  ['f-faculty','f-student','f-internship','f-freelance','f-part-time','f-project','f-paid','f-stipend','f-unpaid']
+    .forEach(id => document.getElementById(id).checked = true);
+  renderFeed();
+}
+
+function renderFeed() {
+  const faculty   = document.getElementById('f-faculty')?.checked;
+  const student   = document.getElementById('f-student')?.checked;
+  const internship= document.getElementById('f-internship')?.checked;
+  const freelance = document.getElementById('f-freelance')?.checked;
+  const parttime  = document.getElementById('f-part-time')?.checked;
+  const project   = document.getElementById('f-project')?.checked;
+  const paid      = document.getElementById('f-paid')?.checked;
+  const stipend   = document.getElementById('f-stipend')?.checked;
+  const unpaid    = document.getElementById('f-unpaid')?.checked;
+  const sort      = document.getElementById('sort-select')?.value || 'default';
+
+  let list = jobs.filter(j => {
+    const sourceOk = (j.poster_role==='faculty' && faculty) || (j.poster_role==='student' && student);
+    const typeOk   = (j.type==='internship'&&internship)||(j.type==='freelance'&&freelance)||(j.type==='part-time'&&parttime)||(j.type==='project'&&project);
+    const compOk   = (j.compensation_type==='paid'&&paid)||(j.compensation_type==='stipend'&&stipend)||(j.compensation_type==='unpaid'&&unpaid);
+    return sourceOk && typeOk && compOk;
+  });
+
+  if (sort==='newest') list.sort((a,b) => new Date(b.created_at)-new Date(a.created_at));
+  else if (sort==='amount') list.sort((a,b) => (b.compensation_amount||0)-(a.compensation_amount||0));
+  else {
+    list.sort((a,b) => {
+      if (a.poster_role==='faculty' && b.poster_role!=='faculty') return -1;
+      if (b.poster_role==='faculty' && a.poster_role!=='faculty') return 1;
+      if (a.compensation_type==='unpaid' && b.compensation_type!=='unpaid') return 1;
+      if (b.compensation_type==='unpaid' && a.compensation_type!=='unpaid') return -1;
+      return new Date(b.created_at)-new Date(a.created_at);
+    });
+  }
+
+  const countEl = document.getElementById('feed-count');
+  if (countEl) countEl.textContent = `(${list.length})`;
+  const listEl = document.getElementById('job-list');
+  if (!listEl) return;
+  if (!list.length) {
+    listEl.innerHTML = `<div class="empty-state"><p>No opportunities match the selected filters.</p></div>`;
+    return;
+  }
+  listEl.innerHTML = list.map(j => jobRowHTML(j)).join('');
+}
+
+function jobRowHTML(j) {
+  const compBadgeHTML = (() => {
+    if (j.compensation_type==='paid')    return `<span class="badge badge-paid">₹ Paid</span>`;
+    if (j.compensation_type==='stipend') return `<span class="badge badge-stipend">₹ Stipend</span>`;
+    return `<span class="badge badge-unpaid">Unpaid</span>`;
+  })();
+  const amountHTML = j.compensation_amount
+    ? `<span class="amount-badge">₹ ${j.compensation_amount.toLocaleString('en-IN')}</span>` : '';
+  const posterAvatar = `<span style="width:22px;height:22px;border-radius:50%;background:var(--navy);color:white;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${j.poster_name[0]}</span>`;
+
+  return `
+  <div class="job-row" onclick="openDetail(${j.id},'feed')">
+    <div class="job-row-main">
+      <div class="job-row-top">
+        ${roleBadge(j.poster_role)}
+        <span class="job-row-time">${timeAgo(j.created_at)}</span>
+        ${j.department ? deptBadge(j.department) : ''}
+      </div>
+      <div class="job-row-title">${j.title}</div>
+      <div class="job-row-sub">
+        ${posterAvatar} ${j.poster_name}
+        <span class="divider">|</span>
+        ${typeBadge(j.type)}
+        <span class="divider">|</span>
+        ${timeAgo(j.created_at)}
+      </div>
+      <div class="job-row-desc">${j.description}</div>
+    </div>
+    <div class="job-row-right">
+      <div class="job-row-badges">
+        ${amountHTML}
+        ${compBadgeHTML}
+      </div>
+      <button class="btn-apply" onclick="event.stopPropagation();openDetail(${j.id},'feed')">Apply</button>
+    </div>
+  </div>`;
+}
+
+function compBadge(type, amount) {
+  if (type==='paid')    return `<span class="badge badge-paid">₹${amount?.toLocaleString('en-IN') || '—'} Paid</span>`;
+  if (type==='stipend') return `<span class="badge badge-stipend">₹${amount?.toLocaleString('en-IN') || '—'} Stipend</span>`;
+  return `<span class="badge badge-unpaid">Unpaid</span>`;
+}
+function roleBadge(role) {
+  return role==='faculty'
+    ? `<span class="badge badge-faculty">Faculty</span>`
+    : `<span class="badge badge-student">Student</span>`;
+}
+function typeBadge(t) { return `<span class="badge badge-type">${t}</span>`; }
+function deptBadge(d) { return d ? `<span class="badge badge-dept">${d}</span>` : ''; }
+
+/* ── JOB DETAIL ─────────────────────────────────────────────── */
+async function openDetail(id, origin) {
+  detailOrigin = origin || 'feed';
+  document.getElementById('detail-back-btn').onclick = () => showPage(detailOrigin);
+  currentJobId = id;
+  const res = await api('GET', `/jobs/${id}`);
+  const j = res.job;
+  const apps = res.applications || [];
+  const isMyJob = currentUser && j.created_by === currentUser.id;
+  const alreadyApplied = apps.some(a => a.applicant_id === currentUser?.id);
+
+  let amountBlock = '';
+  if (j.compensation_type !== 'unpaid' && j.compensation_amount) {
+    amountBlock = `
+    <div class="detail-amount-block">
+      <div class="detail-amount-num">₹${j.compensation_amount.toLocaleString('en-IN')}</div>
+      <div>
+        <div style="font-weight:600;font-size:13px;color:var(--navy)">${j.compensation_type==='paid'?'Fixed Pay':'Stipend'}</div>
+        <div class="detail-amount-label">Total compensation for this role</div>
+      </div>
+    </div>`;
+  }
+  let timelineBlock = '';
+  if (j.compensation_type === 'unpaid' && j.timeline) {
+    timelineBlock = `<div class="detail-timeline"><strong>What you'll receive:</strong>${j.timeline}</div>`;
+  }
+
+  document.getElementById('detail-card').innerHTML = `
+    <div class="detail-meta">
+      ${roleBadge(j.poster_role)}
+      ${typeBadge(j.type)}
+      ${compBadge(j.compensation_type, j.compensation_amount)}
+      ${deptBadge(j.department)}
+    </div>
+    <h1>${j.title}</h1>
+    <div class="detail-desc">${j.description}</div>
+    ${amountBlock}${timelineBlock}
+    <div class="detail-poster">
+      <div class="poster-avatar">${j.poster_name[0]}</div>
+      <div class="poster-info">
+        <strong>${j.poster_name}</strong>
+        ${j.poster_role} · posted ${timeAgo(j.created_at)}
+      </div>
+    </div>
+  `;
+
+  const applyEl = document.getElementById('apply-section');
+  if (isMyJob) {
+    applyEl.innerHTML = `
+      <h2>Applicants (${apps.length})</h2>
+      ${apps.length ? apps.map(a => applicantRowHTML(a)).join('') : '<p style="color:var(--muted);font-size:14px">No applications yet.</p>'}
+    `;
+  } else if (alreadyApplied) {
+    applyEl.innerHTML = `<p style="color:var(--muted);font-size:14px;padding:8px 0">✓ You've already applied to this opportunity.</p>`;
+  } else {
+    applyEl.innerHTML = `
+      <h2>Apply for this Opportunity</h2>
+      <div class="form-group">
+        <label>Your Proposal *</label>
+        <textarea id="apply-proposal" rows="5" placeholder="Introduce yourself, highlight relevant skills, and explain why you're a great fit…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Proposed Bid (₹) — optional</label>
+        <input type="number" id="apply-bid" placeholder="Leave blank to match posted amount" min="0" />
+        <div class="form-hint">Only relevant for freelance / project types.</div>
+      </div>
+      <button class="btn-submit" onclick="submitApplication()">Submit Application</button>
+    `;
+  }
+
+  showPage('detail');
+}
+
+function applicantRowHTML(a) {
+  const statusBadge = `<span class="badge badge-${a.status}">${a.status}</span>`;
+  const actions = a.status === 'pending' ? `
+    <div class="applicant-actions">
+      <button class="btn-accept" onclick="updateApp(${a.id},'accepted')">Accept</button>
+      <button class="btn-reject" onclick="updateApp(${a.id},'rejected')">Reject</button>
+    </div>` : statusBadge;
+  return `
+  <div class="applicant-row">
+    <div class="poster-avatar">${a.applicant_name[0]}</div>
+    <div class="applicant-info">
+      <div class="applicant-name">${a.applicant_name}</div>
+      <div class="applicant-enroll">${a.enrollment_no}</div>
+      <div class="applicant-proposal">${a.proposal_text}</div>
+      ${a.bid_amount ? `<div class="applicant-bid">Bid: ₹${a.bid_amount.toLocaleString('en-IN')}</div>` : ''}
+    </div>
+    ${actions}
+  </div>`;
+}
+
+async function updateApp(appId, status) {
+  await api('PATCH', `/applications/${appId}`, { status });
+  showToast(`Application ${status}.`, 'success');
+  openDetail(currentJobId);
+}
+
+async function submitApplication() {
+  const proposal = document.getElementById('apply-proposal').value.trim();
+  const bid = document.getElementById('apply-bid').value;
+  if (!proposal) { showToast('Please write a proposal.', 'error'); return; }
+  await api('POST', `/jobs/${currentJobId}/apply`, {
+    proposal_text: proposal,
+    bid_amount: bid ? parseFloat(bid) : null,
+  });
+  showToast('Application submitted successfully!', 'success');
+  openDetail(currentJobId);
+}
+
+/* ── POST JOB ───────────────────────────────────────────────── */
+function onCompChange() {
+  const val = document.getElementById('pj-comp').value;
+  document.getElementById('pj-amount-group').classList.toggle('hidden', val==='unpaid'||!val);
+  document.getElementById('pj-timeline-group').classList.toggle('hidden', val!=='unpaid');
+}
+
+async function submitJob() {
+  const title = document.getElementById('pj-title').value.trim();
+  const desc  = document.getElementById('pj-desc').value.trim();
+  const type  = document.getElementById('pj-type').value;
+  const comp  = document.getElementById('pj-comp').value;
+  const dept  = document.getElementById('pj-dept').value.trim();
+  const amount= document.getElementById('pj-amount').value;
+  const timeline = document.getElementById('pj-timeline').value.trim();
+  if (!title||!desc||!type||!comp) { showToast('Please fill all required fields.', 'error'); return; }
+  if (comp==='unpaid' && !timeline) { showToast('Unpaid roles require a description of what collaborators receive.', 'error'); return; }
+  const res = await api('POST', '/jobs', {
+    title, description: desc, type, compensation_type: comp, department: dept,
+    compensation_amount: amount ? parseFloat(amount) : null,
+    timeline: comp==='unpaid' ? timeline : null,
+  });
+  if (res.ok) {
+    showToast('Opportunity posted!', 'success');
+    ['pj-title','pj-desc','pj-dept','pj-amount','pj-timeline'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('pj-type').value='';
+    document.getElementById('pj-comp').value='';
+    document.getElementById('pj-amount-group').classList.add('hidden');
+    document.getElementById('pj-timeline-group').classList.add('hidden');
+    showPage('feed');
+  }
+}
+
+/* ── DASHBOARD ──────────────────────────────────────────────── */
+async function loadDashboard() {
+  document.getElementById('dash-heading').textContent = `Welcome back, ${currentUser?.name.split(' ')[0]}`;
+  document.getElementById('dash-sub').textContent = `Enrollment: ${currentUser?.enrollment_no} · ${currentUser?.role}`;
+  const myPosts = mockJobs.filter(j => j.created_by === currentUser?.id);
+  const appsRes = await api('GET', '/applications/mine');
+  const myApps  = appsRes.applications || [];
+
+  const postsEl = document.getElementById('tab-posts');
+  postsEl.innerHTML = myPosts.length ? myPosts.map(j => {
+    const appCount = mockApplications.filter(a => a.job_id===j.id).length;
+    return `
+    <div class="dashboard-row" onclick="openDetail(${j.id},'dashboard')">
+      <div class="dashboard-row-info">
+        <div class="dashboard-row-title">${j.title}</div>
+        <div class="dashboard-row-sub">${j.department || 'General'} · ${j.type} · posted ${timeAgo(j.created_at)}</div>
+      </div>
+      <div class="dashboard-row-right">
+        ${compBadge(j.compensation_type, j.compensation_amount)}
+        <span class="applicant-count">${appCount} applicant${appCount===1?'':'s'}</span>
+      </div>
+    </div>`;
+  }).join('') : `<div class="empty-state"><p>You haven't posted anything yet.<br><span style="color:var(--navy);cursor:pointer;font-weight:600" onclick="showPage('post')">Post your first opportunity →</span></p></div>`;
+
+  const appsEl = document.getElementById('tab-apps');
+  appsEl.innerHTML = myApps.length ? myApps.map(a => `
+    <div class="dashboard-row" onclick="openDetail(${a.job_id},'dashboard')">
+      <div class="dashboard-row-info">
+        <div class="dashboard-row-title">${a.job_title || 'Opportunity'}</div>
+        <div class="dashboard-row-sub">Applied ${timeAgo(a.created_at)}</div>
+      </div>
+      <div class="dashboard-row-right">
+        <span class="badge badge-${a.status}">${a.status}</span>
+      </div>
+    </div>`).join('') : `<div class="empty-state"><p>You haven't applied to anything yet.<br><span style="color:var(--navy);cursor:pointer;font-weight:600" onclick="showPage('feed')">Browse opportunities →</span></p></div>`;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['posts','apps'][i]===name));
+  document.querySelectorAll('.tab-content').forEach((c,i) => c.classList.toggle('active', ['posts','apps'][i]===name));
+}
+
+/* ── UTILS ──────────────────────────────────────────────────── */
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const d = Math.floor(diff/86400000);
+  if (d===0) return 'today';
+  if (d===1) return 'yesterday';
+  if (d<7)   return `${d} days ago`;
+  if (d<30)  return `${Math.floor(d/7)}w ago`;
+  return `${Math.floor(d/30)}mo ago`;
+}
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
