@@ -1,91 +1,127 @@
-# Nexus — Amity WorkGraph
-Internal campus freelance and opportunity marketplace
+# Amity WorkGraph
 
-## Demo Overview
-Nexus is a closed-network marketplace designed for students and faculty. The platform facilitates a structured workflow where users post opportunities, relevant candidates submit applications, and posters review and accept candidates. Operating strictly as an internal system, it establishes a high-trust environment by restricting access to verified campus personnel.
+### Internal Campus Opportunity Infrastructure
 
-## Architecture
-### Frontend
-The client application is built with React and Vite. It utilizes the React Context API for authentication state management and local storage for session persistence across a component-based user interface.
+Amity WorkGraph is a closed-network collaboration and opportunity platform designed for students and faculty within a university environment.
 
-### Backend
-The server is implemented using Node.js and Express. It connects to a SQLite database (`node:sqlite`) configured in WAL (Write-Ahead Log) mode to support efficient concurrent operations.
+The platform explores how trusted institutional systems can support freelance work, collaborative projects, research opportunities, and campus coordination through role-based infrastructure and structured workflows.
 
-## Database Design
-The core data architecture relies on a three-table relational schema:
-- **users**: Stores identity markers, role designation, and authentication password hashes.
-- **jobs**: Records opportunity definitions, compensation metrics, and foreign key relations to the posting entity.
-- **applications**: Maps applicants to jobs alongside their textual proposals and optional bid amounts.
+---
 
-Integrity is enforced at the database level using a `unique_application` index to prevent duplicate submissions by the same applicant for a specific job. The `enrollment_no` functions as the primary platform identity key.
+# Overview
 
-## Auth System
-The authentication and identity verification infrastructure has undergone the following distinct iterations:
-- **V1**: Static mock login utilizing hardcoded client-side state mapping.
-- **V2**: Enrollment-based identity resolution using a backend find-or-create mechanism without cryptographic verification.
-- **V3 (Current)**: Password-based authentication utilizing `bcrypt` hashing. The initial login sequence for a recognized enrollment number inherently functions as registration, durably storing the password hash. Subsequent authentication attempts mandate cryptographic password verification against the stored hash.
+Amity WorkGraph started as an attempt to solve a recurring campus problem:
 
-## Feature Set
-- Role-based login and session creation (student and faculty)
-- Job posting interface with strict compensation logic validation
-- Dynamic job feed featuring multi-dimensional filtering
-- Application submission gateway accepting proposals and bids
-- Consolidated personal dashboard tracking authored posts and active applications
-- Application status control mechanism (accept/reject handlers)
+opportunities existed, but access to them was fragmented, informal, and inconsistent.
 
-## System Evolution
+Students often discovered freelance work, research opportunities, or collaborative projects through disconnected WhatsApp groups, personal networks, or scattered announcements. Faculty faced similar friction while trying to identify reliable collaborators or distribute opportunities efficiently.
 
-### Phase 1
-Static Nexus HTML prototype implementation. This phase established the monolithic visual design language and user experience layouts utilizing vanilla web technologies.
+The platform was designed as a structured internal system where verified students and faculty could:
+- post opportunities
+- submit applications
+- review candidates
+- manage workflows
+- coordinate collaborations
 
-### Phase 2
-React migration. The initial static asset was dismantled and architected into a componentized React application. This process segregated rendering logic into distinct pages and reusable components while centralizing style declarations.
+within a trusted institutional environment.
 
-### Phase 3
-Backend integration. The Express development server and SQLite instances were established. RESTful API routes were defined and wired to the client tier to fully replace the legacy mock request interceptors.
+Instead of functioning like a public marketplace, Amity WorkGraph focuses on closed-network infrastructure built around verified campus identity systems.
 
-### Phase 4
-Identity system fixes. Enrollment format validation was enforced on both the client and server layers. Faculty identity generation was normalized to ensure deterministic identifier assignment preventing duplicate logical users.
+---
 
-### Phase 5
-Password authentication. The platform was upgraded to integrate `bcrypt`. The core authentication controller was rewritten to securely handle first-time dynamic registration scenarios alongside standard returning user verifications without relying on external state.
+# Core Idea
 
-## Running Locally
+Most opportunity systems inside universities operate through fragmented communication channels.
 
-### Backend
-Navigate to the backend directory and initiate the service. Note that the experimental sqlite flag is required.
-```bash
-cd backend
-node --experimental-sqlite src/index.js
-```
+This creates:
+- poor discoverability
+- inconsistent trust
+- duplicate coordination effort
+- weak institutional memory
+- scattered collaboration pipelines
 
-### Frontend
-Navigate to the frontend directory and start the Vite development server.
-```bash
-cd frontend
-npm run dev
-```
+Amity WorkGraph attempts to centralize these systems through:
+- verified identity infrastructure
+- role-based workflows
+- structured applications
+- persistent dashboards
+- centralized opportunity discovery
 
-## Demo Flow
-1. Authenticate using a faculty role.
-2. Formulate and post a new opportunity.
-3. Authenticate using a student role configuration.
-4. Locate the newly created opportunity and submit an application.
-5. Authenticate again via the initial faculty credentials.
-6. Review the pending application within the dashboard and accept it.
+---
 
-## Known Limitations
-- Session trust relies strictly on header transmission; formal JWT generation and validation layers are absent.
-- No self-service password reset infrastructure.
-- Complete absence of University Single Sign-On (SSO) integration.
-- Bound to SQLite, an architecture not natively suitable for wide-scale horizontal production deployment.
+# Key Features
 
-## Future Roadmap
-- Implementation of cryptographically secure JWT authentication logic
-- University-level SSO infrastructure integrations
-- Multi-campus horizontal scaling deployment architecture
-- Auditable work records and bidirectional rating systems
-- Alumni network ingestion capabilities
+## Role-Based Identity System
 
-## Author
-Swapnil Karki
+Separate workflows for:
+- students
+- faculty
+
+Enrollment-based identity logic ensures all activity remains tied to verified institutional users.
+
+---
+
+## Opportunity Posting System
+
+Faculty and students can:
+- publish opportunities
+- define compensation
+- specify requirements
+- manage application pipelines
+
+---
+
+## Structured Application Workflows
+
+Applicants can:
+- submit proposals
+- place bids
+- track application status
+- manage participation history
+
+Posters can:
+- review candidates
+- accept/reject applications
+- manage workflow progression
+
+---
+
+## Dynamic Opportunity Feed
+
+Multi-dimensional filtering system supporting:
+- role-based discovery
+- opportunity browsing
+- application tracking
+- dashboard persistence
+
+---
+
+## Iterative Authentication Architecture
+
+The authentication system evolved across multiple implementation stages:
+
+### V1
+Static client-side authentication prototype.
+
+### V2
+Enrollment-based identity resolution using backend user creation logic.
+
+### V3
+bcrypt-secured password authentication with durable identity persistence and cryptographic verification.
+
+---
+
+# System Architecture
+
+```text
+Frontend Client
+    ↓
+Authentication Layer
+    ↓
+REST API Gateway
+    ↓
+Application Logic
+    ↓
+SQLite Database
+    ↓
+Role-Based Workflow System
