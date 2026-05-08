@@ -125,3 +125,92 @@ Application Logic
 SQLite Database
     ↓
 Role-Based Workflow System
+Technology Stack
+Frontend
+React
+Vite
+JavaScript
+CSS
+Backend
+Node.js
+Express.js
+SQLite
+Authentication
+bcrypt
+Enrollment-based identity verification
+Session persistence
+Database Design
+
+The platform uses a relational three-table architecture:
+
+users
+
+Stores:
+
+identity markers
+enrollment numbers
+role designation
+password hashes
+jobs
+
+Stores:
+
+opportunity definitions
+compensation metadata
+posting relationships
+applications
+
+Stores:
+
+applicant mappings
+proposals
+bid values
+workflow state
+
+Database-level integrity constraints prevent duplicate applications and enforce referential consistency.
+
+Example Workflow
+Faculty logs in and posts an opportunity.
+Students browse the opportunity feed.
+Students submit proposals and bids.
+Faculty reviews applications.
+Selected applicants are accepted into the workflow.
+Running Locally
+Backend
+cd backend
+
+node --experimental-sqlite src/index.js
+Frontend
+cd frontend
+
+npm install
+
+npm run dev
+Design Philosophy
+
+Amity WorkGraph was designed around:
+
+institutional trust
+workflow clarity
+operational simplicity
+structured collaboration
+persistent coordination systems
+
+Rather than functioning as a generic freelance platform, the system focuses on building trusted internal infrastructure for academic environments.
+
+Known Limitations
+No JWT-based authentication layer
+No password recovery system
+No university SSO integration
+SQLite architecture limits large-scale deployment
+Future Directions
+University SSO integration
+JWT authentication
+Multi-campus deployment
+Auditable work records
+Alumni collaboration systems
+Cross-department opportunity discovery
+Institutional analytics dashboards
+Author
+
+Swapnil Karki
